@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Supply Chain - Pakistan Agricultural Supply Chain Mapping</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="stylearrow.css"> -->
+    <!-- <link href="https://unpkg.com/tippy.js@6/dist/tippy.css" rel="stylesheet"> -->
+    <script src="https://cdn.tailwindcss.com/3.4.6"></script>
+    <!-- <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script> -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'olive-green': '#45552C',
+                        'reseda-green': '#747545',
+                        'fresh-green': '#6BBF59',
+                        'burnt-orange': '#A65C2D',
+                        'dun': '#DBC7B1',
+                        'alabaster': '#EAE3DB',
+                        'dark-grey': '#3D3D3D',
+                        'dark-brown': '#5C4033'
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                        'open-sans': ['Open Sans', 'sans-serif'],
+                        'nunito': ['Nunito', 'sans-serif']
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Supply Chain Styles */
+        .supply-chain-container {
+            position: relative;
+            width: 100%;
+            /* max-width: 1200px; */
+            height: 550px;
+            margin: 0 auto;
+            overflow: visible;
+        }
+
+        .stage-node {
+            position: absolute;
+            width: 200px;
+            /* Increased width to prevent text cutoff */
+            text-align: center;
+            transition: transform 0.3s ease;
+            z-index: 5;
+        }
+
+        .stage-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .stage-number {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 24px;
+            height: 24px;
+            border: 2px solid white;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .dropdown-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background-color: #93948f;
+            border: 1px solid white;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+
+        .dropdown-arrow i {
+            font-size: 14px;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+
+        .dropdown-arrow:hover {
+            transform: scale(1.1);
+        }
+
+        .stage-title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom:5px;
+            gap: 5px;
+            /* ← this adds clean spacing between title and arrow */
+        }
+
+
+        .stage-title {
+            color: white;
+            padding: 8px 12px;
+            font-size: 16px;
+            border-radius: 15px;
+            font-weight: bold;
+            width: 200px;
+            /* uniform width fix ki */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'Nunito', sans-serif;
+            text-align: center;
+            /* text ko center align kiya */
+        }
+
+        .stage-description {
+            color:#000000;
+            font-size: 12px;
+            max-width: 260px;
+            margin: 0 auto;
+            font-family: 'Open Sans', sans-serif;
+            line-height: 1.5;
+        }
+
+        /* === BASE TOOLTIP STYLES === */
+        .stage-tooltip {
+            visibility: hidden;
+            position: absolute;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow-y: auto;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: left;
+        }
+
+        /* === NORMAL TOOLTIP STYLES === */
+        .tooltip {
+            background-color: white;
+            border: 1px solid #DBC7B1;
+            color: #3D3D3D;
+            font-family: 'Open Sans', sans-serif;
+            width: 450px;
+            height: 250px;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            color: #3D3D3D;
+        }
+
+        .tooltip-content {
+            font-size: 12px;
+            color: #3D3D3D;
+            line-height: 1.6;
+        }
+
+        .tooltip-stats {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #DBC7B1;
+            font-size: 11px;
+            color: #646441;
+        }
+
+        /* === BOTTLENECK TOOLTIP STYLES === */
+        .bottleneck-tooltip {
+            background-color: #fafafa;
+            border: 1px solid #cc5500;
+            color: #c50;
+            font-family: 'Open Sans', sans-serif;
+            width: 240px;
+            height: 240px;
+        }
+
+        .bottleneck-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            color: #cc5500;
+        }
+
+        .bottleneck-content {
+            font-size: 12px;
+            color: #cc5500;
+            line-height: 1.6;
+        }
+
+        /* === QUOTE TOOLTIP STYLES === */
+        .quote-tooltip {
+            background-color: #fafafa;
+            border: 1px solid #cc5500;
+            color: #cc5500;
+            font-family: 'Open Sans', sans-serif;
+            width: 240px;
+            height: 240px;
+        }
+
+        .quote-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            color: #cc5500;
+        }
+
+        .quote-content {
+            font-size: 12px;
+            color: #cc5500;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .stage-tooltip.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-buttons {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .tooltip-btn {
+            padding: 6px 12px;
+            background: #3D3D3D;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.2s;
+        }
+
+        .tooltip-btn:hover {
+            background: #3D3D3D;
+        }
+
+        .bottleneck-tooltip {
+            z-index: 150;
+        }
+
+        .quote-tooltip {
+            z-index: 150;
+        }
+
+        .close-nested-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #cc5500;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-nested-btn:hover {
+            background-color: rgba(204, 85, 0, 0.1);
+            border-radius: 50%;
+        }
+
+        .toggle-button {
+            background-color: white;
+            color: #3D3D3D;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border: 1px solid #3D3D3D;
+            font-size: 14px;
+            font-family: 'Nunito', sans-serif;
+            margin-right: 10px;
+        }
+
+        .toggle-button:hover {
+            background-color: #EAE3DB;
+        }
+
+        .toggle-button.active {
+            background-color: #EAE3DB;
+            color: #3D3D3D;
+            border: 1px solid #EAE3DB;
+        }
+
+        .toggle-button.active:hover {
+            background-color: #EAE3DB;
+            border: 1px solid #EAE3DB;
+        }
+
+        /* Scrollbar Styles for All Tooltips */
+        .stage-tooltip::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .stage-tooltip::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .stage-tooltip::-webkit-scrollbar-thumb {
+            background: #c1c1c191;
+            border-radius: 4px;
+        }
+
+        .stage-tooltip::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+
+
+        /* Modal specific adjustments */
+        .supply-chain-modal {
+            transform: scale(0.85);
+            transform-origin: center top;
+        }
+
+        /* Background image styles */
+        .supply-chain-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            /* match container */
+            height: 126%;
+            background-size: cover;
+            /* fills area */
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.4;
+            z-index: 1;
+        }
+
+        .text-center.mt-24 {
+        position: relative;
+        z-index: 5;  /* background se upar */
+    }
+
+
+        /* Responsive adjustments for supply chain */
+        @media (max-width: 1200px) {
+            .supply-chain-modal {
+                transform: scale(0.75);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .supply-chain-modal {
+                transform: scale(0.65);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .supply-chain-modal {
+                transform: scale(0.55);
+            }
+
+            .tooltip,
+            .bottleneck-tooltip {
+                width: 200px;
+            }
+
+            .background-heading {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .supply-chain-modal {
+                transform: scale(0.45);
+            }
+
+            .background-heading {
+                font-size: 1.2rem;
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: left;
+        }
+
+        /* #productOverview {
+            position: relative;
+            z-index: 10;
+            background: white;
+            /* Ensure it has solid background */
+            /* margin-top: 160px; */
+            /* Increase this value to push it down */
+        /* } */ 
+    </style>
+</head>
+
+<body class="bg-alabaster font-open-sans text-dark-grey">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 flex items-center justify-center bg-olive-green rounded-full text-white relative">
+                    <i class="ri-plant-line ri-lg"></i>
+                    <div
+                        class="absolute -bottom-1 -right-1 w-6 h-6 bg-fresh-green rounded-full flex items-center justify-center">
+                        <div class="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-olive-green font-poppins">BEEJ</h1>
+                    <p class="text-xs text-reseda-green font-nunito">Cultivating Knowledge</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-olive-green font-medium font-nunito">Home Page</a>
+                <a href="about.html"
+                    class="text-reseda-green hover:text-olive-green transition-colors font-nunito">About Us</a>
+                <a href="maps.html"
+                    class="text-reseda-green hover:text-olive-green transition-colors font-nunito">Geographical
+                    Breakdown</a>
+                <a href="products.html"
+                    class="text-reseda-green hover:text-olive-green transition-colors font-nunito">Supply Chain
+                    Analysis</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <!-- <div class="relative ml-4">
+                    <input type="text" placeholder="Search products..."
+                        class="pl-10 pr-4 py-2 w-48 border border-dun rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-olive-green/20 focus:border-olive-green bg-white font-nunito">
+                    <div
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-reseda-green">
+                        <i class="ri-search-line"></i>
+                    </div>
+                </div> -->
+                <div class="w-10 h-10 flex items-center justify-center md:hidden cursor-pointer">
+                    <i class="ri-menu-line ri-lg text-olive-green"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-10 bg-white">
+        <div class="container mx-auto mb-8">
+            <!--     <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-olive-green mb-4 font-poppins">Apple Supply Chain</h2>
+                <p class="text-sm text-reseda-green max-w-2xl mx-auto font-open-sans leading-relaxed">
+                    Detailed visualization of Pakistan's apple supply chain from orchard establishment to retail markets
+                    in Northern Pakistan
+                </p>
+            </div> -->
+
+            <div class="bg-alabaster rounded-lg shadow-lg border border-dun">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-xl font-bold text-olive-green font-poppins flex items-center gap-2">
+                        Apple Supply Chain Map
+                        <img src="https://i.postimg.cc/RFwp62gh/apple.png" alt="Apple Icon"
+                            class="w-14 h-14 object-contain rounded-md border border-alabaster">
+                    </h3>
+                    <div class="flex space-x-2">
+                        <!-- <button id="toggleBottlenecks" class="toggle-button">Show Bottlenecks</button>
+                        <button id="toggleQuotes" class="toggle-button">Show Quotes</button> -->
+                    </div>
+                </div>
+                <div id="supplyChainContainer" class="supply-chain-container">
+                    <!-- Supply chain stages will be generated here -->
+                </div>
+                <div class="text-center mt-24">
+                    <button onclick="window.location.href='products.html'"
+                        class="px-4 py-2.5 bg-olive-green text-white rounded-button hover:bg-reseda-green transition-colors font-medium font-nunito">
+                        View More Products
+                    </button>
+                </div>
+            </div>
+
+
+
+        </div>
+    </section>
+
+    <script id="mobile-menu-toggle">
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuButton = document.querySelector('.ri-menu-line').parentNode;
+            const mobileMenu = document.createElement('div');
+            mobileMenu.className = 'fixed inset-0 bg-gray-800 bg-opacity-50 z-50 hidden';
+            mobileMenu.innerHTML = `
+                <div class="bg-white h-full w-64 shadow-xl transform transition-transform p-6">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="font-bold text-xl text-olive-green font-poppins">Menu</h3>
+                        <div class="w-8 h-8 flex items-center justify-center cursor-pointer close-menu">
+                            <i class="ri-close-line ri-lg text-olive-green"></i>
+                        </div>
+                    </div>
+                    <nav class="space-y-4">
+                        <a href="index.html" class="block py-2 text-reseda-green font-nunito">Home</a>
+                        <a href="products.html" class="block py-2 text-reseda-green font-nunito">Products</a>
+                        <a href="maps.html" class="block py-2 text-reseda-green font-nunito">Maps</a>
+                        <a href="about.html" class="block py-2 text-reseda-green font-nunito">About</a>
+                    </nav>
+                </div>
+            `;
+            document.body.appendChild(mobileMenu);
+            menuButton.addEventListener('click', function () {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.querySelector('div').classList.add('translate-x-0');
+                mobileMenu.querySelector('div').classList.remove('-translate-x-full');
+            });
+            mobileMenu.querySelector('.close-menu').addEventListener('click', function () {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.querySelector('div').classList.remove('translate-x-0');
+                mobileMenu.querySelector('div').classList.add('-translate-x-full');
+            });
+        });
+    </script>
+
+    <script id="apple-supply-chain-data">
+        const productBackgroundImages = {
+            'Apple': 'https://cdn.pixabay.com/photo/2019/03/14/21/15/apple-4055926_1280.jpg'
+        }
+        // Apple supply chain data
+        const appleSupplyChainData = {
+            stages: [
+                 {
+                    "title": "Seeding",
+                    "description": "Selecting suitable land and planting grafted apple saplings during winter",
+                    "icon": "https://i.ibb.co/LzrhY1Lk/Seed-Selection.png",
+                    "position": { "top": 85, "left": 200 },
+                    "tooltip": {
+                        "title": "Land Selection and Seeding Details",
+                        "content": "<p>Apple orchards are established in regions with cold winters, mild summers, and loamy, well-drained soils. Farmers level the land and space the trees to ensure proper irrigation. Grafted saplings are planted during the winter season for optimal establishment.</p><b>Ideal Conditions for Apple Orchards</b><table><tr><th>Factor</th><th>Ideal Condition</th></tr><tr><td>Altitude</td><td>High-altitude, semi-dry</td></tr><tr><td>Climate</td><td>Cold winters, mild summers</td></tr><tr><td>Soil</td><td>Loamy, well-drained</td></tr><tr><td>Chill Hours</td><td>Required for dormancy</td></tr></table>",
+                        "stats": [
+                            "Planting Season: Winter (Dec–Feb)",
+                            "Sapling Type: Grafted and disease-resistant",
+                            "Spacing Purpose: Facilitates irrigation access"
+                        ]
+                    },
+                    "bottleneck": "Soil quality inconsistencies and limited water availability in some areas.",
+                    "quote": "\u201cAam tor pe sardiyon mien beech lagan shuroon kar dethe hai... garmiyon ke start mien he hum channa shurron kar dethe hai.\u201d \u2014 Ahmed\n\u201cShaakhe hothi hai na, hum usko kaat dethe hai... naye shakhe asake jin pe saib ug sakhe... fertilizer ko badalthe rehthe hai.\u201d"
+                },
+                {
+                    "title": "Orchard Management",
+                    "description": "Irrigation, pruning, fertilization, and pest control to support healthy growth",
+                    "icon": "https://i.ibb.co/sJgxZJZK/Land-Preparation.png",
+                    "position": { "top": 85, "left": 500 },
+                    "tooltip": {
+                        "title": "Orchard Management and Maintenance Details",
+                        "content": "<p>Apple orchard upkeep includes irrigation through pipe-fed sprinklers, regular pruning, and organic pest control supported by beneficial insects. Seasonal fertilization ensures nutrient balance in the soil.</p><b>Routine Orchard Tasks</b><table><tr><th>Task</th><th>Method</th></tr><tr><td>Irrigation</td><td>Sprinklers (pipe-fed systems)</td></tr><tr><td>Pruning</td><td>Manual, to improve fruiting</td></tr><tr><td>Fertilization</td><td>Seasonally adjusted inputs</td></tr><tr><td>Pest Control</td><td>Organic pesticides + predator insects</td></tr></table>",
+                        "stats": [
+                            "Technology: Beneficial insects for pest control",
+                            "Groundwater Issue: Declining water tables impact irrigation",
+                            "Fertilizer Schedule: Adjusted per seasonal soil conditions"
+                        ]
+                    },
+                    "bottleneck": "Water scarcity due to falling groundwater, heat stress, and recurring pest outbreaks.",
+                    "quote": "\u201cOrganic khaas tor pe pesticides ke zarye hum use control karthe hai... keerain daal dethe hai jo saib khane wale keeron ko dhur rakhthe.\u201d \u2014 Ahmed\n\u201cPipes ke through sprinklers nikle huwe we hai jis ke through pani jatha hai in saibo taraf.\u201d \u2014 Ahmed\n\u201cSab se bara masla pani ka hai... keerain bohoth ajathe hai... mausam ke tabdeeli ke waja se bohoth farq partha hai.\u201d \u2014 Ahmed"
+                },
+                {
+                    "title": "Ripening and Harvesting",
+                    "description": "Apples mature from July to October depending on variety; picking is done by hand to avoid bruising",
+                    "icon": "https://i.ibb.co/7JpjP5NT/Harvesting.png",
+                    "position": { "top": 85, "left": 800 },
+                    "tooltip": {
+                        title: "Fruit Ripening and Harvesting Details",
+                        "content": "<p>Apples ripen between July and October depending on the variety. Harvesting is carried out manually using skilled labor to avoid bruising and preserve shelf life.</p><b>Ripening Timeline</b><table><tr><th>Variety</th><th>Ripens</th></tr><tr><td>Kamla, Kala Kullu</td><td>July – Early August</td></tr><tr><td>Red Delicious</td><td>September</td></tr><tr><td>Golden Delicious</td><td>Late Sept – October</td></tr></table>",
+                        "stats": [
+                            "Harvest Method: Manual picking by trained labor",
+                            "Timing Criteria: Based on color and texture",
+                            "Harvest Risk: Delays reduce shelf life and market value"
+                        ]
+                    },
+                    "bottleneck": "Lack of skilled labor at peak season and risk of bruising during manual harvest.",
+                    "quote": ""
+                },
+                {
+                    "title": "Post-Harvest",
+                    "description": "Post-harvest apples are sorted by quality and stored in cold units if available",
+                    "icon": "https://i.ibb.co/4R9pdZzz/Drying-Post-Harvest-Handling.png",
+                    "position": { "top": 285, "left": 800 },
+                    "tooltip": {
+                        title: "Sorting, Grading and On-Farm Storage Details",
+                        "content": "<p>After harvest, apples are sorted based on size, appearance, and quality. Cold storage units help reduce spoilage, though access remains limited for many growers.</p><b>Sorting & Grading Criteria</b><table><tr><th>Aspect</th><th>Details</th></tr><tr><td>Size</td><td>Large apples preferred for premium sale</td></tr><tr><td>Appearance</td><td>Uniform color, no blemishes</td></tr><tr><td>Damage</td><td>Bruised or insect-bitten apples separated</td></tr></table>",
+                        "stats": [
+                            "Spoilage Factor: Higher during warm months without storage",
+                            "Storage Type: On-farm cold rooms where available",
+                            "Grading Benefit: Reduces losses before market"
+                        ]
+                    },
+                    "bottleneck": "Limited access to on-farm cold storage units results in faster spoilage, especially during warm months.",
+                    "quote": ""
+                },
+                {
+                    "title": "Transportation",
+                    "description": "Apples are transported to markets via hired vehicles or sold on-farm; cold chain is rare",
+                    "icon": "https://i.ibb.co/JjHCNHzX/Storage-Transport.png",
+                    "position": { "top": 285, "left": 500 },
+                    "tooltip": {
+                        title: "Transportation to Mandis and Distribution Details",
+                        "content": "<p>Apples are sent to mandis using rented vehicles. Cold trucks are occasionally used but are not affordable for most. Poor road conditions and traffic cause delays and spoilage during peak summer transport.</p><b>Transport Modes</b><table><tr><th>Method</th><th>Details</th></tr><tr><td>Hired Vehicles</td><td>Used by most smallholders</td></tr><tr><td>Cold Trucks</td><td>Occasionally rented, not common</td></tr></table>",
+                        "stats": [
+                            "Primary Mode: Rented vehicles for most farms",
+                            "Cold Chain: Rare and costly",
+                            "Transport Issues: Poor roads, spoilage risk during delays"
+                        ]
+                    },
+                    "bottleneck": "No access to refrigerated transport, poor rural roads, and timing delays that reduce price margins.",
+                    "quote": "\u201cHamare pass hamari apni gariyan nahi hothi...cold storage wali gariyaan karwani padthi hai...roads kharab hain...market ke rates uppar neeche horahe hothe hai...deal karna padta hai.\u201d \u2014 Ahmed"
+                },
+                {
+                    "title": "Market & Sales",
+                    "description": "Apples are sold in mandis through middlemen or from cold storage when market prices rise",
+                    "icon": "https://i.postimg.cc/SQVH7DLN/marketintermediaries.png",
+                    "position": { "top": 285, "left": 200 },
+                    "tooltip": {
+                        title: "Market Access and Sale to Vendors Details",
+                        "content": "<p>Farmers sell primarily through wholesale mandis, with middlemen controlling price and access. Cold storage enables some to delay selling and benefit from price spikes, but direct access to urban or export buyers remains rare.</p><b>Sales Channels</b><table><tr><th>Method</th><th>Details</th></tr><tr><td>Mandis</td><td>Main selling point via middlemen</td></tr><tr><td>Cold Storage</td><td>Allows delayed sale during off-season</td></tr><tr><td>Direct Sale</td><td>Rare due to lack of buyer links</td></tr></table>",
+                        "stats": [
+                            "Buyer Access: Mostly through middlemen",
+                            "Price Advantage: Cold storage allows strategic sale",
+                            "Infrastructure Limitation: Lack of direct market channels"
+                        ]
+                    },
+                    "bottleneck": "Farmers face price exploitation, lack direct urban/export links, and have limited options during peak season due to infrastructure gaps.",
+                    "quote": "\u201cHamare pass coldstorage hai tho hum rakh dethe hai saib ko... market mein demand hothi hai tho hum bhaij dethe hai.\u201d \u2014 Ahmed\n\u201cHum alag alag aqsam ke saib ugathe rehthe hai.\u201d"
+                }
+            ],
+        };
+
+        // Apple color scheme
+        const appleColors = {
+           background: '#F9FBE7',
+            titleBackground: '#D21F3C',
+            tooltipBackground: '#F9FBE7',
+            stageIconBg: ' #D21F3C',
+        };
+    </script>
+
+    <script id="apple-supply-chain-script">
+        document.addEventListener('DOMContentLoaded', function () {
+            generateAppleSupplyChain();
+            initializeSupplyChain();
+        });
+
+        function generateAppleSupplyChain() {
+            const container = document.getElementById('supplyChainContainer');
+            const productData = appleSupplyChainData;
+            const colors = appleColors;
+
+            let stagesHTML = '';
+            let tooltipsHTML = '';
+
+            // Background image
+            const backgroundImage = productBackgroundImages['Apple'] || '';
+            if (backgroundImage) {
+                stagesHTML += `<div class="supply-chain-background" style="background-image: url('${backgroundImage}');"></div>`;
+            }
+
+            productData.stages.forEach((stage, index) => {
+                const top = stage.position.top;
+                const left = stage.position.left;
+
+                // Stage Node
+                stagesHTML += `
+                    <div class="stage-node" style="top:${top}px; left:${left}px;" data-stage-id="${index}">
+                        <div class="stage-icon" style="background-color:${colors.background};">
+                            <img src="${stage.icon}" alt="${stage.title} icon" class="h-12 w-12" />
+                            <div class="stage-number" style="background-color:${colors.stageIconBg};">${index + 1}</div>
+                        </div>
+                        <div class="stage-title-container">
+                            <div class="stage-title" style="background-color:${colors.titleBackground};">${stage.title}</div>
+                            <div class="dropdown-arrow" onclick="toggleStageTooltip(${index})">▼</div>
+                        </div>
+                        <div class="stage-description">${stage.description}</div>
+                    </div>
+                `;
+
+                // Main Tooltip
+                tooltipsHTML += `
+                    <div class="tooltip stage-tooltip" id="tooltip-${index}" data-index="${index}"
+                         style="top:${top + 120}px; left:${left}px; transform:translateX(-50%); background-color:${colors.tooltipBackground}; color:${colors.tooltipText};">
+                        <button class="close-nested-btn" onclick="hideStageTooltip(${index})">&times;</button>
+                        <div class="tooltip-title">${stage.tooltip.title || stage.title + ' Details'}</div>
+                        <div class="tooltip-content">${stage.tooltip.content}</div>
+                        <div class="tooltip-stats">
+                            ${stage.tooltip.stats.map(stat => `<div>${stat}</div>`).join('')}
+                        </div>
+                        <div class="tooltip-buttons">
+                            <button class="tooltip-btn" onclick="showBottleneckTooltip(${index})">View Bottlenecks</button>
+                            <button class="tooltip-btn" onclick="showQuoteTooltip(${index})">View Quotes</button>
+                        </div>
+                    </div>
+                `;
+
+                // Bottleneck Tooltip
+                tooltipsHTML += `
+                    <div class="bottleneck-tooltip stage-tooltip" id="bottleneck-${index}">
+                        <button class="close-nested-btn" onclick="hideNestedTooltip(${index})">&times;</button>
+                        <div class="bottleneck-title">Bottlenecks</div>
+                        <div class="bottleneck-content">${stage.bottleneck}</div>
+                    </div>
+                `;
+
+                // Quote Tooltip
+                tooltipsHTML += `
+                    <div class="quote-tooltip stage-tooltip" id="quote-${index}">
+                        <button class="close-nested-btn" onclick="hideNestedTooltip(${index})">&times;</button>
+                        <div class="quote-title">Field Insights</div>
+                        <div class="quote-content">${stage.quote}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = stagesHTML + tooltipsHTML;
+
+            const modal = document.querySelector('.supply-chain-modal') || container;
+
+            // Position tooltips safely (prevent overflow)
+            document.querySelectorAll('.stage-tooltip').forEach(tooltip => {
+                const index = parseInt(tooltip.getAttribute('data-index'));
+                if (isNaN(index)) return;
+
+                const stage = productData.stages[index];
+                const tooltipWidth = tooltip.offsetWidth;
+                const tooltipHeight = tooltip.offsetHeight;
+
+                let newTop = stage.position.top + 120;
+                let newLeft = stage.position.left;
+
+                if (newTop + tooltipHeight > modal.offsetHeight) {
+                    newTop = stage.position.top - tooltipHeight - 10;
+                }
+                if (newLeft - tooltipWidth / 2 < 0) {
+                    newLeft = tooltipWidth / 2 + 10;
+                } else if (newLeft + tooltipWidth / 2 > modal.offsetWidth) {
+                    newLeft = modal.offsetWidth - tooltipWidth / 2 - 10;
+                }
+
+                tooltip.style.top = `${newTop}px`;
+                tooltip.style.left = `${newLeft}px`;
+            });
+        }
+
+        // === Tooltip logic ===
+        function hideStageTooltip(index) {
+            const tooltip = document.getElementById(`tooltip-${index}`);
+            if (tooltip) tooltip.classList.remove('visible');
+        }
+
+        function initializeSupplyChain() {
+            document.querySelectorAll('.stage-tooltip').forEach(tooltip => {
+                tooltip.classList.remove('visible');
+            });
+        }
+
+        let currentOpenTooltip = null;
+
+        function toggleStageTooltip(stageIndex) {
+            const tooltip = document.getElementById(`tooltip-${stageIndex}`);
+            const arrow = document.querySelector(`[data-stage-id="${stageIndex}"] .dropdown-arrow`);
+
+            if (currentOpenTooltip !== null && currentOpenTooltip !== stageIndex) {
+                closeAllTooltipsForStage(currentOpenTooltip);
+            }
+
+            if (tooltip && tooltip.classList.contains('visible')) {
+                closeAllTooltipsForStage(stageIndex);
+                currentOpenTooltip = null;
+            } else {
+                if (tooltip && arrow) {
+                    tooltip.classList.add('visible');
+                    arrow.classList.add('active');
+                    currentOpenTooltip = stageIndex;
+                }
+            }
+        }
+
+        function closeAllTooltipsForStage(stageIndex) {
+            const tooltip = document.getElementById(`tooltip-${stageIndex}`);
+            const arrow = document.querySelector(`[data-stage-id="${stageIndex}"] .dropdown-arrow`);
+            const bottleneckTooltip = document.getElementById(`bottleneck-${stageIndex}`);
+            const quoteTooltip = document.getElementById(`quote-${stageIndex}`);
+
+            if (tooltip) tooltip.classList.remove('visible');
+            if (arrow) arrow.classList.remove('active');
+            if (bottleneckTooltip) bottleneckTooltip.classList.remove('visible');
+            if (quoteTooltip) quoteTooltip.classList.remove('visible');
+        }
+
+        function showBottleneckTooltip(stageIndex) {
+            const mainTooltip = document.getElementById(`tooltip-${stageIndex}`);
+            const bottleneckTooltip = document.getElementById(`bottleneck-${stageIndex}`);
+            const quoteTooltip = document.getElementById(`quote-${stageIndex}`);
+
+            mainTooltip.classList.remove('visible');
+            quoteTooltip.classList.remove('visible');
+            bottleneckTooltip.classList.add('visible');
+        }
+
+        function showQuoteTooltip(stageIndex) {
+            const mainTooltip = document.getElementById(`tooltip-${stageIndex}`);
+            const bottleneckTooltip = document.getElementById(`bottleneck-${stageIndex}`);
+            const quoteTooltip = document.getElementById(`quote-${stageIndex}`);
+
+            mainTooltip.classList.remove('visible');
+            bottleneckTooltip.classList.remove('visible');
+            quoteTooltip.classList.add('visible');
+        }
+
+        function hideNestedTooltip(stageIndex) {
+            const mainTooltip = document.getElementById(`tooltip-${stageIndex}`);
+            const bottleneckTooltip = document.getElementById(`bottleneck-${stageIndex}`);
+            const quoteTooltip = document.getElementById(`quote-${stageIndex}`);
+
+            bottleneckTooltip.classList.remove('visible');
+            quoteTooltip.classList.remove('visible');
+            mainTooltip.classList.add('visible');
+        }
+    </script>
+
+
+</body>
+
+</html>
