@@ -841,7 +841,7 @@
     <div id="supplyChainModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
         <div class="min-h-screen px-4 text-center">
             <div
-                class="inline-block w-full max-w-[92vw] h-[100vh] my-4 text-left align-middle bg-white rounded shadow-xl transform transition-all border border-dun">
+                class="inline-block w-full max-w-[95vw] h-[95vh] my-4 text-left align-middle bg-white rounded shadow-xl transform transition-all border border-dun">
                 <div class="relative h-full flex flex-col">
                     <div class="flex items-center justify-between p-2 border-b bg-alabaster flex-shrink-0">
                         <h3 class="text-2xl font-bold text-olive-green font-poppins" id="modalTitle">Supply Chain Map
@@ -852,7 +852,7 @@
                             </div>
                         </button>
                     </div>
-                    <div class="flex-1 p-6 overflow-y-auto">
+                    <div class="flex-1 p-6 relative overflow-hidden">
                         <div class="supply-chain-modal relative">
                             <!-- Help Icon + Label (moved OUTSIDE scaling) -->
                             <div id="helpIconWrapper"
@@ -890,7 +890,7 @@
                                 </div>
                             </div>
 
-                            <div id="supplyChainContainer" class="supply-chain-container">
+                            <div id="supplyChainContainer" class="supply-chain-container" style="right: 58px">
                                 <!-- Supply chain content will be dynamically generated here -->
                             </div>
 
