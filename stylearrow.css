@@ -72,14 +72,14 @@
     display: block;
     top: 360px;
     left: 110px;
-    transform: rotate(15deg);
+    transform: rotate(-15deg);
 }
 
 /* Wheat Arrows */
 .WheatArrow{
     position: absolute;
     display: none;
-    width: 70px;
+    width: 80px;
 }
 .WheatArrow.arrow0{
     display: block;
@@ -133,7 +133,7 @@
     display: block;
     top: 210px;
    
-    left: 1150px;
+    left: 1130px;
     transform: scaleX(-1) rotate(-45deg);
 }
 .WheatArrow.curvearrow1{
@@ -265,7 +265,7 @@
     display: block;
     top: 360px;
     left: 110px;
-    transform: rotate(20deg);
+    transform: rotate(-15deg);
 }
 
 /* Orange Arrows*/
@@ -273,7 +273,7 @@
 .OrangeArrow {
     position: absolute;
     display: none;
-    width: 70px;
+    width: 80px;
 }
 
 .OrangeArrow.arrow0 {
@@ -335,15 +335,15 @@
 
 .OrangeArrow.curvearrow0 {
     display: block;
-    top: 230px;
-    left: 1160px;
+    top: 210px;
+    left: 1140px;
     transform: scaleX(-1) rotate(-35deg);
 }
 
 .OrangeArrow.curvearrow1 {
     display: block;
-    top: 440px;
-    left: 30px;
+    top: 420px;
+    left: 35px;
     transform: rotate(-35deg);
 }
 
@@ -389,14 +389,14 @@
 .MaizeArrow.curvearrow0 {
     display: block;
     top: 150px;
-    left: 900px;
+    left: 850px;
     transform: scaleX(-1) rotate(-10deg);
 }
 
 .MaizeArrow.curvearrow1 {
     display: block;
     top: 400px;
-    left: 120px;
+    left: 140px;
     transform: rotate(-42deg);
 }
 
@@ -507,7 +507,7 @@
     display: block;
     transform: rotate(180deg);
     top: 250px;
-    left: 710px;
+    left: 410px;
 }
 
 .TomatoArrow.arrow3 {
@@ -525,7 +525,7 @@
 
 .TomatoArrow.arrow5 {
     display: block;
-    top: 400px;
+    top: 450px;
     left: 590px;
 }
 
@@ -546,7 +546,7 @@
     display: block;
     top: 360px;
     left: 110px;
-    transform: rotate(20deg);
+    transform: rotate(-15deg);
 }
 
 /* Potato */
@@ -650,15 +650,15 @@
 .RiceArrow.curvearrow0 {
     display: block;
     top: 200px;
-    left: 980px;
+    left: 960px;
     transform: scaleX(-1) rotate(-42deg);
 }
 
 .RiceArrow.curvearrow1 {
     display: block;
     top: 360px;
-    left: 110px;
-    transform: rotate(20deg);
+    left: 120px;
+    transform: rotate(-15deg);
 }
 
 /* Sugarcane */
@@ -723,7 +723,7 @@
     display: block;
     top: 360px;
     left: 110px;
-    transform: rotate(20deg);
+    transform: rotate(-15deg);
 }
 
 /* Garlic*/
@@ -796,36 +796,35 @@
 
 .AppleArrow.arrow0 {
     display: block;
-    top: 80px;
-    left: 410px;
+    top: 50px;
+    left: 550px;
 }
 
 .AppleArrow.arrow1 {
     display: block;
-    top: 80px;
-    left: 710px;
+    top: 250px;
+    left: 550px;
+    transform:scaleX(-1)
 }
-
-.AppleArrow.arrow2 {
+.AppleArrow.arrow2{
     display: block;
-    transform: rotate(180deg);
-    top: 300px;
-    left: 710px;
+    top: 450px;
+    left: 550px;
 }
-
 .AppleArrow.curvearrow0 {
     display: block;
-    top: 250px;
-    left: 980px;
+    top: 200px;
+    left: 880px;
     transform: scaleX(-1) rotate(-42deg);
 }
 
-.AppleArrow.arrow3 {
+.AppleArrow.curvearrow1 {
     display: block;
-    transform: rotate(180deg);
-    top: 300px;
-    left: 410px;
+    top: 420px;
+    left: 220px;
+    transform: rotate(-42deg);
 }
+
 
 /* Mustard */
 .MustardArrow{
@@ -879,36 +878,34 @@
     width: 80px;
 }
 
+
 .LentilsArrow.arrow0 {
     display: block;
-    top: 80px;
-    left: 410px;
+    top: 50px;
+    left: 550px;
 }
 
 .LentilsArrow.arrow1 {
     display: block;
-    top: 80px;
-    left: 710px;
+    top: 250px;
+    left: 550px;
+    transform:scaleX(-1)
 }
-
-.LentilsArrow.arrow2 {
+.LentilsArrow.arrow2{
     display: block;
-    transform: rotate(180deg);
-    top: 300px;
-    left: 710px;
+    top: 450px;
+    left: 550px;
 }
-
 .LentilsArrow.curvearrow0 {
     display: block;
-    top: 250px;
-    left: 980px;
+    top: 200px;
+    left: 880px;
     transform: scaleX(-1) rotate(-42deg);
 }
 
-.LentilsArrow.arrow3 {
+.LentilsArrow.curvearrow1 {
     display: block;
-    transform: rotate(180deg);
-    top: 300px;
-    left: 410px;
+    top: 420px;
+    left: 220px;
+    transform: rotate(-42deg);
 }
-
